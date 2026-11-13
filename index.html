@@ -6,6 +6,8 @@
     <title>Alfred Enterprise | Quality Electronics & Financial Services</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#d4af37">
+    <link rel="apple-touch-icon" href="/icons/icon-512.png">
     <style>
         /* --- LUXURIOUS GOLD & EMERALD THEME ENHANCEMENTS --- */
         body {
@@ -465,6 +467,15 @@
             text += `%0ATotal Amount: NLe ${total.toFixed(2)}%0APlease confirm my order.`;
             window.open(`https://wa.me/23276655025?text=${text}`, '_blank');
         }
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(() => console.log('Service Worker registered successfully'))
+            .catch((err) => console.log('Service Worker registration failed: ', err));
+        });
+      }
     </script>
 </body>
 </html>
