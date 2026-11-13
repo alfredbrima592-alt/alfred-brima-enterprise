@@ -1,9 +1,5 @@
 {
-  "name": "alfred-enterprise",
-  "version": "2.0.0",
-  "description": "Alfred Enterprise E-Commerce & Affiliate Hub",
-  "private": true,
-  "dependencies": {
-    "@netlify/blobs": "^8.0.0"
-  }
+  "name": "alfred-brima-enterprise",
+  "version": "1.0.0",
+  "private": true
 }
