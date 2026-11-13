@@ -133,11 +133,11 @@
 
             <!-- Add New Product Form -->
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-4">
-                <h4 class="font-semibold text-sm text-amber-300">Add New Product Online</h4>
+                <h4 class="font-semibold text-sm text-amber-300">Add New Product Online (Multiple Sizes & Watts)</h4>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Product Name</label>
-                        <input type="text" id="new-prod-name" placeholder="e.g. Rechargeable Fan" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                        <input type="text" id="new-prod-name" placeholder="e.g. LED Bulb" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Category</label>
@@ -148,10 +148,32 @@
                             <option value="Hardware">Hardware</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Price (NLe)</label>
-                        <input type="number" id="new-prod-price" placeholder="1500" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+
+                    <!-- Multi-Size / Wattage Builder -->
+                    <div class="sm:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <label class="block text-xs font-semibold text-amber-300">Sizes / Wattages & Prices (NLe)</label>
+                                <p class="text-[11px] text-slate-400">Add as many size/watt options as you need (e.g. 5W, 7W, 10W, 60W).</p>
+                            </div>
+                            <button type="button" onclick="addSizeRow()" class="bg-amber-600 hover:bg-amber-500 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold">+ Add Size/Watt</button>
+                        </div>
+                        
+                        <div id="size-rows-container" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                            <!-- Default rows for quick entry -->
+                            <div class="flex gap-2 items-center size-row">
+                                <input type="text" placeholder="Size/Watt (e.g. 5 Watts)" class="flex-1 bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white size-input-name">
+                                <input type="number" placeholder="Price NLe" class="w-28 bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white size-input-price">
+                                <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-300 text-xs px-2 py-1">✕</button>
+                            </div>
+                            <div class="flex gap-2 items-center size-row">
+                                <input type="text" placeholder="Size/Watt (e.g. 10 Watts)" class="flex-1 bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white size-input-name">
+                                <input type="number" placeholder="Price NLe" class="w-28 bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white size-input-price">
+                                <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-300 text-xs px-2 py-1">✕</button>
+                            </div>
+                        </div>
                     </div>
+
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Product Photo</label>
                         <input type="file" id="new-prod-image" accept="image/*" class="w-full text-xs text-slate-300 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950">
@@ -281,6 +303,20 @@
                 ownerKey = "";
                 document.getElementById("owner-toggle-btn").innerText = "Owner Login";
             }
+            renderProducts();
+        }
+
+        // Add Dynamic Size Row in Owner Panel
+        function addSizeRow() {
+            const container = document.getElementById("size-rows-container");
+            const row = document.createElement("div");
+            row.className = "flex gap-2 items-center size-row";
+            row.innerHTML = `
+                <input type="text" placeholder="Size/Watt (e.g. 15 Watts)" class="flex-1 bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white size-input-name">
+                <input type="number" placeholder="Price NLe" class="w-28 bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white size-input-price">
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-300 text-xs px-2 py-1">✕</button>
+            `;
+            container.appendChild(row);
         }
 
         // Load Profile Picture from Netlify Blobs Backend
@@ -341,7 +377,7 @@
             }
         }
 
-        // Render Products Grid
+        // Render Products Grid with Multiple Sizes/Watts Dropdown
         function renderProducts() {
             const grid = document.getElementById("products-grid");
             document.getElementById("product-count").innerText = `${products.length} items available`;
@@ -349,42 +385,89 @@
                 grid.innerHTML = `<p class="text-xs text-slate-400 col-span-full text-center py-6">No products found online yet. Use Owner Mode to add products.</p>`;
                 return;
             }
-            grid.innerHTML = products.map((p, index) => `
-                <div class="bg-slate-900 border border-amber-500/20 rounded-xl overflow-hidden shadow-lg flex flex-col justify-between hover:border-amber-500/50 transition">
-                    <div>
-                        <img src="${p.image || 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=300'}" alt="${p.name}" class="w-full h-40 object-cover">
-                        <div class="p-4 space-y-2">
-                            <span class="text-xs bg-amber-950 text-amber-300 border border-amber-700/50 px-2.5 py-0.5 rounded font-semibold">${p.category}</span>
-                            <h4 class="font-bold text-base text-white">${p.name}</h4>
-                            <p class="text-xs text-slate-300 line-clamp-2">${p.description}</p>
+            grid.innerHTML = products.map((p, index) => {
+                let sizes = p.sizes;
+                if (!sizes || sizes.length === 0) {
+                    sizes = [{ name: 'Standard', price: p.price || 0 }];
+                }
+
+                return `
+                    <div class="bg-slate-900 border border-amber-500/20 rounded-xl overflow-hidden shadow-lg flex flex-col justify-between hover:border-amber-500/50 transition">
+                        <div>
+                            <img src="${p.image || 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=300'}" alt="${p.name}" class="w-full h-40 object-cover">
+                            <div class="p-4 space-y-2">
+                                <span class="text-xs bg-amber-950 text-amber-300 border border-amber-700/50 px-2.5 py-0.5 rounded font-semibold">${p.category}</span>
+                                <h4 class="font-bold text-base text-white">${p.name}</h4>
+                                <p class="text-xs text-slate-300 line-clamp-2">${p.description}</p>
+                                
+                                <!-- Multiple Sizes / Watts Selection Dropdown -->
+                                <div class="pt-2">
+                                    <label class="block text-[11px] text-slate-400 mb-1">Select Size / Wattage & Price:</label>
+                                    <select id="size-select-${index}" onchange="updateDisplayPrice(${index})" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-xs text-white">
+                                        ${sizes.map((s, sIndex) => `<option value="${sIndex}">${s.name} - NLe ${s.price}</option>`).join('')}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 pt-0 flex justify-between items-center border-t border-slate-800 mt-2">
+                            <span id="price-display-${index}" class="font-extrabold text-amber-400">NLe ${sizes[0].price}</span>
+                            <div class="flex gap-2">
+                                <button onclick="addToCart(${index})" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold">Add to Cart</button>
+                                ${ownerKey ? `<button onclick="deleteProduct(${index})" class="bg-red-600 hover:bg-red-500 px-2 py-1.5 rounded-lg text-xs text-white">Delete</button>` : ''}
+                            </div>
                         </div>
                     </div>
-                    <div class="p-4 pt-0 flex justify-between items-center border-t border-slate-800 mt-2">
-                        <span class="font-extrabold text-amber-400">NLe ${p.price}</span>
-                        <div class="flex gap-2">
-                            <button onclick="addToCart(${index})" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold">Add to Cart</button>
-                            ${ownerKey ? `<button onclick="deleteProduct(${index})" class="bg-red-600 hover:bg-red-500 px-2 py-1.5 rounded-lg text-xs text-white">Delete</button>` : ''}
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
-        // Add New Product
+        // Update Price on Screen when customer selects a different watt/size
+        function updateDisplayPrice(index) {
+            const select = document.getElementById(`size-select-${index}`);
+            const selectedIdx = select.value;
+            const p = products[index];
+            let sizes = p.sizes && p.sizes.length > 0 ? p.sizes : [{ name: 'Standard', price: p.price || 0 }];
+            const chosenSize = sizes[selectedIdx];
+            document.getElementById(`price-display-${index}`).innerText = `NLe ${chosenSize.price}`;
+        }
+
+        // Add New Product with Multiple Sizes/Watts
         async function addNewProduct() {
             const name = document.getElementById("new-prod-name").value.trim();
             const category = document.getElementById("new-prod-category").value;
-            const price = document.getElementById("new-prod-price").value;
             const desc = document.getElementById("new-prod-desc").value.trim();
             const fileInput = document.getElementById("new-prod-image");
 
-            if (!name || !price) {
-                alert("Please provide at least a product name and price.");
+            if (!name) {
+                alert("Please provide a product name.");
+                return;
+            }
+
+            // Gather all dynamic size/watt rows
+            let sizes = [];
+            const rowElements = document.querySelectorAll(".size-row");
+            rowElements.forEach(row => {
+                const sName = row.querySelector(".size-input-name").value.trim();
+                const sPrice = row.querySelector(".size-input-price").value;
+                if (sName && sPrice) {
+                    sizes.push({ name: sName, price: parseFloat(sPrice) });
+                }
+            });
+
+            if (sizes.length === 0) {
+                alert("Please add at least one size/wattage option and its price.");
                 return;
             }
 
             const saveNewItem = async (imageUrl) => {
-                const newProduct = { name, category, price, description: desc, image: imageUrl || "" };
+                const newProduct = { 
+                    name, 
+                    category, 
+                    price: sizes[0].price, 
+                    sizes, 
+                    description: desc, 
+                    image: imageUrl || "" 
+                };
                 products.push(newProduct);
                 try {
                     const res = await fetch("/.netlify/functions/products", {
@@ -396,9 +479,8 @@
                         body: JSON.stringify({ products })
                     });
                     if (res.ok) {
-                        alert("Product saved online successfully and is visible to all customers!");
+                        alert("Product with multiple wattages/sizes saved online successfully!");
                         document.getElementById("new-prod-name").value = "";
-                        document.getElementById("new-prod-price").value = "";
                         document.getElementById("new-prod-desc").value = "";
                         document.getElementById("new-prod-image").value = "";
                         renderProducts();
@@ -445,9 +527,21 @@
 
         function addToCart(index) {
             const prod = products[index];
-            cart.push(prod);
+            let sizes = prod.sizes && prod.sizes.length > 0 ? prod.sizes : [{ name: 'Standard', price: prod.price || 0 }];
+            
+            const select = document.getElementById(`size-select-${index}`);
+            const selectedIdx = select ? select.value : 0;
+            const chosenSize = sizes[selectedIdx];
+
+            const cartItem = {
+                name: prod.name,
+                sizeName: chosenSize.name,
+                price: chosenSize.price
+            };
+
+            cart.push(cartItem);
             updateCartUI();
-            alert(`${prod.name} added to cart!`);
+            alert(`${prod.name} (${chosenSize.name}) added to cart!`);
         }
 
         function updateCartUI() {
@@ -464,7 +558,7 @@
                 return `
                     <div class="flex justify-between items-center bg-slate-800 p-3 rounded-lg border border-slate-700 text-sm">
                         <div>
-                            <p class="font-bold text-white">${item.name}</p>
+                            <p class="font-bold text-white">${item.name} <span class="text-xs text-amber-300 font-normal">(${item.sizeName})</span></p>
                             <p class="text-xs text-amber-400">NLe ${item.price}</p>
                         </div>
                         <button onclick="removeFromCart(${i})" class="text-xs text-red-400 hover:text-red-300">Remove</button>
@@ -479,7 +573,7 @@
             updateCartUI();
         }
 
-        // WhatsApp Ordering with Customer Details
+        // WhatsApp Ordering with Customer Details & Sizes/Watts
         function checkoutWhatsApp() {
             if (cart.length === 0) {
                 alert("Your cart is empty!");
@@ -506,7 +600,7 @@
 
             let total = 0;
             cart.forEach((item, index) => {
-                text += `${index + 1}. ${item.name} - NLe ${item.price}%0A`;
+                text += `${index + 1}. ${item.name} [Option: ${item.sizeName}] - NLe ${item.price}%0A`;
                 total += parseFloat(item.price || 0);
             });
             text += `%0A💰 *Total Amount:* NLe ${total.toFixed(2)}%0APlease confirm my order.`;
